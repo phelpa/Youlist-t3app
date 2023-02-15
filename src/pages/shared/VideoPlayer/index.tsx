@@ -1,4 +1,5 @@
 import YouTube from "react-youtube";
+import type { YouTubeEvent, YouTubePlayer } from "react-youtube";
 
 interface IProps {
   youtubeId: string;
@@ -6,13 +7,13 @@ interface IProps {
 
 declare global {
   interface Window {
-    youtubePlayer: any;
+    youtubePlayer: YouTubePlayer;
   }
 }
 
 const VideoPlayer = ({ youtubeId }: IProps) => {
-  const makeYouTubePlayer = (e: any) => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+  const makeYouTubePlayer = (e: YouTubeEvent) => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     window.youtubePlayer = e.target;
   };
 

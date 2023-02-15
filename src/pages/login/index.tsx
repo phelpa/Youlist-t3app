@@ -1,5 +1,5 @@
-import Annotations from "../../shared/Annotations";
-import VideoPlayer from "../../shared/VideoPlayer";
+import Annotations from "../shared/Annotations";
+import VideoPlayer from "../shared/VideoPlayer";
 
 const Login = () => {
   return (
