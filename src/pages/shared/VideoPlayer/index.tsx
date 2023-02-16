@@ -3,6 +3,7 @@ import type { YouTubeEvent, YouTubePlayer } from "react-youtube";
 
 interface IProps {
   youtubeId: string;
+  className?: string;
 }
 
 declare global {
@@ -11,7 +12,7 @@ declare global {
   }
 }
 
-const VideoPlayer = ({ youtubeId }: IProps) => {
+const VideoPlayer = ({ youtubeId, className }: IProps) => {
   const makeYouTubePlayer = (e: YouTubeEvent) => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     window.youtubePlayer = e.target;
@@ -19,8 +20,9 @@ const VideoPlayer = ({ youtubeId }: IProps) => {
 
   return (
     <YouTube
-      className="my-4"
+      className={`my-4 ${className ?? ""}`}
       id="videoplayer"
+      iframeClassName="w-full h-[50vh] lg:h-[70vh]"
       videoId={youtubeId}
       opts={{}}
       onReady={makeYouTubePlayer}

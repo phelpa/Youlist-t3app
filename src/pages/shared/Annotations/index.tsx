@@ -11,7 +11,11 @@ type FormValues = {
   text: string;
 };
 
-const Annotations = () => {
+interface IProps {
+  className?: string;
+}
+
+const Annotations = ({ className }: IProps) => {
   const { register, handleSubmit, setValue, watch } = useForm<FormValues>({});
   const [currentTime, setCurrentTime] = React.useState("0:00");
 
@@ -19,8 +23,6 @@ const Annotations = () => {
     { text: "Click to move to this time", videotime: 200 },
     { text: "Great question", videotime: 500 },
   ]);
-
-  const text = watch("text");
 
   const addAnnotation: SubmitHandler<FormValues> = ({ text }, e) => {
     e?.preventDefault();
@@ -66,7 +68,7 @@ const Annotations = () => {
   };
 
   return (
-    <div className="p-4">
+    <div className={`p-4 ${className ?? ""}`}>
       {annotations.map(({ text, videotime }) => (
         <div className="my-2 flex gap-2" key={text}>
           <span
@@ -97,7 +99,6 @@ const Annotations = () => {
             id="input-group-1"
             className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 pl-14 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500  dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
             placeholder="Type and hit enter"
-            value={text}
           />
         </div>
       </form>

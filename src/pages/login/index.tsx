@@ -10,9 +10,14 @@ const Login = () => {
           Sign In
         </button>
 
-        <div className="flex">
-          <VideoPlayer youtubeId="kBdfcR-8hEY" />
-          <Annotations />
+        <div className="container">
+          <div className="grid grid-cols-12">
+            <VideoPlayer
+              youtubeId="kBdfcR-8hEY"
+              className="col-span-12 lg:col-span-6 lg:col-start-2"
+            />
+            <Annotations className="col-span-12 lg:col-span-4" />
+          </div>
         </div>
       </div>
     </>
