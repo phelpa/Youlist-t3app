@@ -1,12 +1,18 @@
 import Annotations from "../shared/Annotations";
 import VideoPlayer from "../shared/VideoPlayer";
+import { signIn, signOut, useSession } from "next-auth/react";
 
 const Login = () => {
+  const { data: sessionData } = useSession();
+
+  console.log(sessionData, "oia so");
+
   return (
     <>
       <div className="align-center my-2 flex flex-col items-center">
         <div className="p-2 text-5xl">YouList</div>
         <a
+          onClick={sessionData ? () => void signOut() : () => void signIn()}
           rel="noopener nofollow noreferrer"
           className="hover:text-black-700 mr-3 inline-flex items-center rounded-lg border border-gray-200 bg-white px-4 py-2 text-xs font-medium text-gray-900 hover:cursor-pointer hover:bg-gray-100 focus:z-10 focus:outline-none focus:ring-2 focus:ring-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-500"
         >
@@ -24,19 +30,19 @@ const Login = () => {
             <clipPath id="b">
               <use xlinkHref="#a" overflow="visible" />
             </clipPath>
-            <path clip-path="url(#b)" fill="#FBBC05" d="M0 37V11l17 13z" />
+            <path clipPath="url(#b)" fill="#FBBC05" d="M0 37V11l17 13z" />
             <path
-              clip-path="url(#b)"
+              clipPath="url(#b)"
               fill="#EA4335"
               d="M0 11l17 13 7-6.1L48 14V0H0z"
             />
             <path
-              clip-path="url(#b)"
+              clipPath="url(#b)"
               fill="#34A853"
               d="M0 37l30-23 7.9 1L48 0v48H0z"
             />
             <path
-              clip-path="url(#b)"
+              clipPath="url(#b)"
               fill="#4285F4"
               d="M48 48L17 24l-4-3 35-10z"
             />
