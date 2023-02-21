@@ -3,16 +3,27 @@ import VideoPlayer from "../shared/VideoPlayer";
 import { signIn, signOut, useSession } from "next-auth/react";
 
 const Login = () => {
-  const { data: sessionData } = useSession();
+  const { data: sessionData, status } = useSession();
 
-  console.log(sessionData, "oia so");
+  if (status === "loading") return <div>Loading...</div>;
 
   return (
     <>
+      {sessionData && <span>Logged in as {sessionData.user?.name}</span>}
+      {console.log(sessionData, "oia sessionData")}
       <div className="align-center my-2 flex flex-col items-center">
         <div className="p-2 text-5xl">YouList</div>
         <a
-          onClick={sessionData ? () => void signOut() : () => void signIn()}
+          onClick={
+            sessionData
+              ? () =>
+                  void signOut({ callbackUrl: "http://localhost:3000/login" })
+              : () =>
+                  void signIn(undefined, {
+                    //aqui pode por 'google' para logar direto
+                    callbackUrl: "http://localhost:3000",
+                  })
+          }
           rel="noopener nofollow noreferrer"
           className="hover:text-black-700 mr-3 inline-flex items-center rounded-lg border border-gray-200 bg-white px-4 py-2 text-xs font-medium text-gray-900 hover:cursor-pointer hover:bg-gray-100 focus:z-10 focus:outline-none focus:ring-2 focus:ring-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-500"
         >
@@ -47,7 +58,7 @@ const Login = () => {
               d="M48 48L17 24l-4-3 35-10z"
             />
           </svg>
-          Sign in with Google
+          {sessionData ? "Sign Out" : "Sign in with Google"}
         </a>
         <div className="container">
           <div className="grid grid-cols-12">
@@ -63,4 +74,5 @@ const Login = () => {
   );
 };
 
+Login.publicRoute = true;
 export default Login;
