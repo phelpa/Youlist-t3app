@@ -16,7 +16,7 @@ interface IProps {
 }
 
 const Annotations = ({ className }: IProps) => {
-  const { register, handleSubmit, setValue, watch } = useForm<FormValues>({});
+  const { register, handleSubmit, setValue } = useForm<FormValues>({});
   const [currentTime, setCurrentTime] = React.useState("0:00");
 
   const [annotations, setAnnotations] = React.useState([

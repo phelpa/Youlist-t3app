@@ -12,6 +12,16 @@ export const exampleRouter = createTRPCRouter({
         greeting: `Hello ${input.text} user ${id}`,
       };
     }),
+  getLists: publicProcedure
+    .query(({ ctx }) => {
+      const userId = ctx.session?.user.id as string;
+      const result = ctx.prisma.lists.findMany({
+        where: {
+          lst_usr_id: userId
+        }
+      })
+      return result;
+    }),
   addList: publicProcedure
     .input(
       z.object({
