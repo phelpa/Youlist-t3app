@@ -12,8 +12,7 @@ const Home: NextPage = () => {
   const addList = () => {
     mutation.mutate({
       description: "descrição",
-      title: "titulo",
-      youtube_id: "RebA5J-rlwg",
+      title: "titulo"
     });
   };
 
