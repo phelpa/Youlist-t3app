@@ -6,7 +6,7 @@ export const exampleRouter = createTRPCRouter({
   hello: publicProcedure
     .input(z.object({ text: z.string() }))
     .query(({ input, ctx }) => {
-      const id = ctx.session?.user.id;
+      const id = ctx.session?.user.id ?? ''
       console.log(id, "olha o id");
       return {
         greeting: `Hello ${input.text} user ${id}`,
@@ -22,23 +22,55 @@ export const exampleRouter = createTRPCRouter({
       })
       return result;
     }),
+  getVideosWithListId: publicProcedure
+    .input(
+      z.string()
+    )
+    .query(async ({ ctx, input }) => {
+      const result = await ctx.prisma.videos.findMany({
+        where: {
+          vid_lst_id: input
+        }
+      })
+      return result;
+    }),
+  addVideoWithListId: publicProcedure
+    .input(
+      z.object({
+        title: z.string(),
+        description: z.string(),
+        youtubeId: z.string(),
+        listId: z.string()
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { title, description, youtubeId, listId } = input;
+      const result = await ctx.prisma.videos.create({
+        data: {
+          vid_title: title,
+          vid_description: description,
+          vid_youtube_id: youtubeId,
+          vid_lst_id: listId
+        }
+      })
+      return result;
+    }),
   addList: publicProcedure
     .input(
       z.object({
         description: z.string(),
-        title: z.string(),
-        youtube_id: z.string(),
+        title: z.string()
       })
     )
-    .mutation(({ ctx, input }) => {
-      const { description, title, youtube_id } = input;
+    .mutation(async ({ ctx, input }) => {
+      const { description, title } = input;
       const userId = ctx.session?.user.id as string;
-      const result = ctx.prisma.lists.create({
+      const result = await ctx.prisma.lists.create({
         data: {
           lst_description: description,
           lst_title: title,
           lst_usr_id: userId,
-          lst_youtube_id: youtube_id,
+          lst_youtube_id: '',
         },
       });
       return result;
