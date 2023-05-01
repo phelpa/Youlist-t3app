@@ -18,6 +18,9 @@ export const exampleRouter = createTRPCRouter({
       const result = ctx.prisma.lists.findMany({
         where: {
           lst_usr_id: userId
+        },
+        orderBy: {
+          lst_created: 'desc'
         }
       })
       return result;
@@ -74,6 +77,26 @@ export const exampleRouter = createTRPCRouter({
         },
       });
       return result;
+    }),
+  editList: publicProcedure
+    .input(
+      z.object({
+        description: z.string(),
+        title: z.string(),
+        listId: z.string()
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { description, title, listId } = input;
+      const result = await ctx.prisma.lists.update({
+        where: { lst_id: listId },
+        data: {
+          lst_description: description,
+          lst_title: title
+        }
+      })
+      return result;
+
     }),
   getAll: publicProcedure.query(({ ctx }) => {
     return ctx.prisma.example.findMany();

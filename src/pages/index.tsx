@@ -11,6 +11,7 @@ import useModalWithForm from './hooks/useModalWithForm';
 type FormValues = {
   title: string,
   description: string
+  listId: string
 };
 
 const EditIcon = () => {
@@ -30,24 +31,37 @@ const IconButton = ({ children, ...rest }: IconButtonProps) => {
 
 const Lists = () => {
   const form = useForm<FormValues>({});
-  const { isOpen, openModal, closeModal, updateForm } = useModalWithForm(false, form)
+  const { isOpen, openModal, closeModal, type } = useModalWithForm(false, form)
+
+  const isEdit = type === 'edit';
 
   const router = useRouter()
 
   const { data: lists, refetch } = api.example.getLists.useQuery();
-  const mutation = api.example.addList.useMutation({ onSuccess: () => refetch() });
+  const addMutation = api.example.addList.useMutation({ onSuccess: () => refetch() });
+  const editMutation = api.example.editList.useMutation({ onSuccess: () => refetch() });
 
   const goToList = (listId: string) => async () => {
     await router.push(`/list/${listId}`)
   }
 
   const addList: SubmitHandler<FormValues> = ({ title, description }) => {
-    mutation.mutate({
+    addMutation.mutate({
       description,
       title
     });
     closeModal()
   }
+
+  const editList: SubmitHandler<FormValues> = ({ listId, title, description }) => {
+    editMutation.mutate({
+      listId,
+      description,
+      title
+    });
+    closeModal()
+  }
+
 
 
   return (
@@ -61,7 +75,7 @@ const Lists = () => {
           <div onClick={goToList(list.lst_id)} key={list.lst_id} className="flex cursor-pointer flex-col py-3 px-2 hover:bg-gray-100">
             <dd className="text-lg font-semibold flex items-center justify-between">
               <span>{list.lst_title}</span>
-              <span><IconButton onClick={updateForm({ title: list.lst_title, description: list.lst_description })}><EditIcon /></IconButton></span>
+              <span><IconButton onClick={openModal('edit', { title: list.lst_title, description: list.lst_description, listId: list.lst_id })}><EditIcon /></IconButton></span>
             </dd>
             <dt className="mb-1 text-gray-500">
               {list.lst_description}
@@ -70,7 +84,7 @@ const Lists = () => {
         ))}
         <div className="flex justify-end py-8">
           <button
-            onClick={openModal}
+            onClick={openModal('add')}
             className="text-xl font-semibold mr-2 mb-2 rounded-lg border border-gray-300 px-5 py-2.5 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200"
           >
             Add New List +
@@ -83,10 +97,10 @@ const Lists = () => {
           as="h3"
           className="text-lg font-medium leading-6 text-gray-900 mb-6"
         >
-          New list
+          {isEdit ? 'Edit List' : 'New List'}
         </Dialog.Title>
 
-        <form onSubmit={form.handleSubmit(addList)}>
+        <form onSubmit={form.handleSubmit(isEdit ? editList : addList)}>
           <div className="mb-6">
             <input
               {...form.register("title")}
@@ -111,7 +125,7 @@ const Lists = () => {
               type='submit'
               className="ml-auto mr-2 mb-2 rounded-lg border border-gray-300 px-5 py-2.5 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200"
             >
-              Add List
+              {isEdit ? 'Edit List' : 'Add List'}
             </button>
           </div>
         </form>
