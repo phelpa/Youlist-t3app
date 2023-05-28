@@ -17,10 +17,11 @@ export const exampleRouter = createTRPCRouter({
       const userId = ctx.session?.user.id as string;
       const result = ctx.prisma.lists.findMany({
         where: {
-          lst_usr_id: userId
+          lst_usr_id: userId,
+          lst_deletedAt: null
         },
         orderBy: {
-          lst_created: 'desc'
+          lst_created: 'asc'
         }
       })
       return result;
@@ -73,7 +74,6 @@ export const exampleRouter = createTRPCRouter({
           lst_description: description,
           lst_title: title,
           lst_usr_id: userId,
-          lst_youtube_id: '',
         },
       });
       return result;
@@ -96,12 +96,22 @@ export const exampleRouter = createTRPCRouter({
         }
       })
       return result;
-
+    }),
+  deleteList: publicProcedure
+    .input(
+      z.string()
+    )
+    .mutation(async ({ ctx, input }) => {
+      await ctx.prisma.lists.update({
+        where: { lst_id: input },
+        data: {
+          lst_deletedAt: new Date()
+        }
+      })
     }),
   getAll: publicProcedure.query(({ ctx }) => {
     return ctx.prisma.example.findMany();
   }),
-
   getSecretMessage: protectedProcedure.query(() => {
     return "you can now see this secret message!";
   }),

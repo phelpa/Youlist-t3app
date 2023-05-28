@@ -7,6 +7,7 @@ import type { SubmitHandler } from "react-hook-form";
 import { api } from "../utils/api";
 import { useRouter } from 'next/router'
 import useModalWithForm from './hooks/useModalWithForm';
+import useModalWithData from './hooks/useModalWithData';
 
 type FormValues = {
   title: string,
@@ -16,6 +17,10 @@ type FormValues = {
 
 const EditIcon = () => {
   return <svg xmlns="http://www.w3.org/2000/svg" height='16' width='16' viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" /></svg>
+}
+
+const DeleteIcon = () => {
+  return <svg xmlns="http://www.w3.org/2000/svg" height='16' width='16' viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" /></svg>
 }
 
 type IconButtonProps = {
@@ -29,9 +34,15 @@ const IconButton = ({ children, ...rest }: IconButtonProps) => {
   </button>
 }
 
+type DataToBeDeleted = {
+  listId: string
+}
+
 const Lists = () => {
   const form = useForm<FormValues>({});
+
   const { isOpen, openModal, closeModal, type } = useModalWithForm(false, form)
+  const [isOpenDeleteModal, openDeleteModal, closeDeleteModal, listData] = useModalWithData<DataToBeDeleted>(false)
 
   const isEdit = type === 'edit';
 
@@ -40,6 +51,7 @@ const Lists = () => {
   const { data: lists, refetch } = api.example.getLists.useQuery();
   const addMutation = api.example.addList.useMutation({ onSuccess: () => refetch() });
   const editMutation = api.example.editList.useMutation({ onSuccess: () => refetch() });
+  const deleteMutation = api.example.deleteList.useMutation({ onSuccess: () => refetch() });
 
   const goToList = (listId: string) => async () => {
     await router.push(`/list/${listId}`)
@@ -62,7 +74,10 @@ const Lists = () => {
     closeModal()
   }
 
-
+  const deleteList = () => {
+    deleteMutation.mutate(listData.listId);
+    closeDeleteModal()
+  }
 
   return (
     <div className="flex justify-center px-2">
@@ -75,7 +90,10 @@ const Lists = () => {
           <div onClick={goToList(list.lst_id)} key={list.lst_id} className="flex cursor-pointer flex-col py-3 px-2 hover:bg-gray-100">
             <dd className="text-lg font-semibold flex items-center justify-between">
               <span>{list.lst_title}</span>
-              <span><IconButton onClick={openModal('edit', { title: list.lst_title, description: list.lst_description, listId: list.lst_id })}><EditIcon /></IconButton></span>
+              <div className='flex'>
+                <span><IconButton onClick={openModal('edit', { title: list.lst_title, description: list.lst_description, listId: list.lst_id })}><EditIcon /></IconButton></span>
+                <span><IconButton onClick={openDeleteModal({ listId: list.lst_id })}><DeleteIcon /></IconButton></span>
+              </div>
             </dd>
             <dt className="mb-1 text-gray-500">
               {list.lst_description}
@@ -91,6 +109,26 @@ const Lists = () => {
           </button>
         </div>
       </dl>
+
+      <Modal isOpen={isOpenDeleteModal} onClose={closeDeleteModal}>
+        <Dialog.Title
+          as="h3"
+          className="text-lg font-medium leading-6 text-gray-900 mb-6"
+        >
+          Delete List
+        </Dialog.Title>
+        <p>Are you sure you want to delete the list?</p>
+        <div className="mt-4 flex">
+          <button
+            type='submit'
+            onClick={deleteList}
+            className="ml-auto mr-2 mb-2 rounded-lg border border-gray-300 px-5 py-2.5 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200"
+          >
+            Delete List
+          </button>
+        </div>
+      </Modal>
+
 
       <Modal isOpen={isOpen} onClose={closeModal}>
         <Dialog.Title

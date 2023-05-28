@@ -70,6 +70,7 @@ model Annotations {
   ant_videotime Float
   ant_text      String   
   ant_vid_id    String
+  ant_deletedAt DateTime?
   ant_created   DateTime  @default(now())
   Videos        Videos   @relation(fields: [ant_vid_id], references: [vid_id], onDelete: Cascade)
 }
@@ -78,8 +79,8 @@ model Lists {
   lst_id          String    @id @default(cuid())
   lst_title       String  
   lst_description String  
-  lst_youtube_id  String  
   lst_usr_id      String
+  lst_deletedAt   DateTime? 
   lst_created     DateTime  @default(now())
   User            User    @relation(fields: [lst_usr_id], references: [id], onDelete: Cascade)
   Videos          Videos[]
@@ -91,6 +92,7 @@ model Videos {
   vid_description String        
   vid_youtube_id  String        
   vid_lst_id      String
+  vid_deletedAt   DateTime?
   vid_created     DateTime  @default(now()) 
   Lists           Lists         @relation(fields: [vid_lst_id], references: [lst_id], onDelete: Cascade)
   Annotations     Annotations[]
