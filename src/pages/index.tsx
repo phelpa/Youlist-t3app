@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import Modal from "./shared/Modal";
-import useConfirm from './hooks/useConfirm';
 import * as React from "react";
 import { Dialog } from "@headlessui/react";
 import { useForm } from "./shared/Form";
@@ -8,6 +7,8 @@ import type { SubmitHandler } from "react-hook-form";
 import { api } from "../utils/api";
 import { useRouter } from 'next/router'
 import useModalWithForm from './hooks/useModalWithForm';
+
+import { useConfirm } from '../pages/confirmContext'
 
 type FormValues = {
   title: string,
@@ -36,9 +37,8 @@ const IconButton = ({ children, ...rest }: IconButtonProps) => {
 
 const Lists = () => {
   const form = useForm<FormValues>({});
-
   const { isOpen, openModal, closeModal, type } = useModalWithForm(false, form)
-  const [confirm, ConfirmModal] = useConfirm()
+  const { confirm } = useConfirm()
 
   const isEdit = type === 'edit';
 
@@ -108,8 +108,6 @@ const Lists = () => {
           </button>
         </div>
       </dl>
-
-      <ConfirmModal />
 
       <Modal isOpen={isOpen} onClose={closeModal}>
         <Dialog.Title
