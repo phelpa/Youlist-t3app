@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import Modal from "./shared/Modal";
+import useConfirm from './hooks/useConfirm';
 import * as React from "react";
 import { Dialog } from "@headlessui/react";
 import { useForm } from "./shared/Form";
@@ -7,7 +8,6 @@ import type { SubmitHandler } from "react-hook-form";
 import { api } from "../utils/api";
 import { useRouter } from 'next/router'
 import useModalWithForm from './hooks/useModalWithForm';
-import useModalWithData from './hooks/useModalWithData';
 
 type FormValues = {
   title: string,
@@ -34,15 +34,11 @@ const IconButton = ({ children, ...rest }: IconButtonProps) => {
   </button>
 }
 
-type DataToBeDeleted = {
-  listId: string
-}
-
 const Lists = () => {
   const form = useForm<FormValues>({});
 
   const { isOpen, openModal, closeModal, type } = useModalWithForm(false, form)
-  const [isOpenDeleteModal, openDeleteModal, closeDeleteModal, listData] = useModalWithData<DataToBeDeleted>(false)
+  const [confirm, ConfirmModal] = useConfirm()
 
   const isEdit = type === 'edit';
 
@@ -74,9 +70,13 @@ const Lists = () => {
     closeModal()
   }
 
-  const deleteList = () => {
-    deleteMutation.mutate(listData.listId);
-    closeDeleteModal()
+  const deleteList = (listId: string) => {
+    deleteMutation.mutate(listId);
+  }
+
+  const openOtherDeleteModal = (listId: string) => (e?: React.MouseEvent<HTMLElement>) => {
+    e && e.stopPropagation()
+    confirm({ title: 'Delete List', description: 'Are you sure you want to delete the list?', onConfirm: () => deleteList(listId) })
   }
 
   return (
@@ -85,14 +85,13 @@ const Lists = () => {
         <div className="flex flex-col pb-3">
           <h2 className="my-3 text-2xl font-semibold">Lists</h2>
         </div>
-
         {lists?.map(list => (
           <div onClick={goToList(list.lst_id)} key={list.lst_id} className="flex cursor-pointer flex-col py-3 px-2 hover:bg-gray-100">
             <dd className="text-lg font-semibold flex items-center justify-between">
               <span>{list.lst_title}</span>
               <div className='flex'>
                 <span><IconButton onClick={openModal('edit', { title: list.lst_title, description: list.lst_description, listId: list.lst_id })}><EditIcon /></IconButton></span>
-                <span><IconButton onClick={openDeleteModal({ listId: list.lst_id })}><DeleteIcon /></IconButton></span>
+                <span><IconButton onClick={openOtherDeleteModal(list.lst_id)}><DeleteIcon /></IconButton></span>
               </div>
             </dd>
             <dt className="mb-1 text-gray-500">
@@ -110,25 +109,7 @@ const Lists = () => {
         </div>
       </dl>
 
-      <Modal isOpen={isOpenDeleteModal} onClose={closeDeleteModal}>
-        <Dialog.Title
-          as="h3"
-          className="text-lg font-medium leading-6 text-gray-900 mb-6"
-        >
-          Delete List
-        </Dialog.Title>
-        <p>Are you sure you want to delete the list?</p>
-        <div className="mt-4 flex">
-          <button
-            type='submit'
-            onClick={deleteList}
-            className="ml-auto mr-2 mb-2 rounded-lg border border-gray-300 px-5 py-2.5 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200"
-          >
-            Delete List
-          </button>
-        </div>
-      </Modal>
-
+      <ConfirmModal />
 
       <Modal isOpen={isOpen} onClose={closeModal}>
         <Dialog.Title
