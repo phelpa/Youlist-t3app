@@ -12,23 +12,29 @@ import Input from '../components/Input'
 import Button from '../components/Button'
 import IconButton from '../components/IconButton'
 import { DeleteIcon, EditIcon } from '../icons'
+import useModalWithForm from '../hooks/useModalWithForm';
 
 type FormValues = {
   title: string,
   description: string
   youtubeId: string,
+  videoId: string;
 };
 
 const Videos = () => {
   const router = useRouter();
   const listId = router.query.listId as string;
-  const confirm = useConfirm();
 
   const { data: videos, refetch } = api.example.getVideosWithListId.useQuery(listId)
-  const addMutation = api.example.addVideoWithListId.useMutation({ onSuccess: () => refetch() });
+  const addMutation = api.example.addVideo.useMutation({ onSuccess: () => refetch() });
+  const editMutation = api.example.editVideo.useMutation({ onSuccess: () => refetch() });
   const deleteMutation = api.example.deleteVideo.useMutation({ onSuccess: () => refetch() });
 
   const form = useForm<FormValues>({});
+  const { isOpen, openModal, closeModal, type } = useModalWithForm(false, form)
+  const confirm = useConfirm();
+
+  const isEdit = type === 'edit';
 
   const onYoutubeUrlPaste = (e: ClipboardEvent<HTMLInputElement>) => {
     const ytId = retrieveYoutubeIdFromClipBoard(e)
@@ -37,22 +43,21 @@ const Videos = () => {
     }
   }
 
-  const [isOpen, setIsOpen] = React.useState(false);
-
-  const closeModal = () => {
-    setIsOpen(false);
-  }
-
-  const openModal = () => {
-    setIsOpen(true);
-  }
-
   const addVideo: SubmitHandler<FormValues> = ({ title, description, youtubeId }) => {
     addMutation.mutate({
       title,
       description,
       youtubeId,
       listId
+    });
+    closeModal()
+  }
+
+  const editVideo: SubmitHandler<FormValues> = ({ videoId, title, description }) => {
+    editMutation.mutate({
+      videoId,
+      description,
+      title
     });
     closeModal()
   }
@@ -83,7 +88,7 @@ const Videos = () => {
               <div className="text-lg font-semibold flex items-center justify-between pb-2">
                 <div className="mb-2 text-xl font-bold">{video.vid_title}</div>
                 <div className='flex'>
-                  <IconButton><EditIcon /></IconButton>
+                  <IconButton onClick={openModal('edit', { title: video.vid_title, description: video.vid_description, videoId: video.vid_id, youtubeId: video.vid_youtube_id })}><EditIcon /></IconButton>
                   <IconButton onClick={openDeleteModal(video.vid_id)}><DeleteIcon /></IconButton>
                 </div>
               </div>
@@ -96,7 +101,7 @@ const Videos = () => {
 
         <div className="mt-10">
           <button
-            onClick={openModal}
+            onClick={openModal('add')}
             className="text-xl font-semibold mr-2 mb-2 rounded-lg border border-gray-300 px-5 py-2.5 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200"
           >
             Add New Video +
@@ -107,10 +112,10 @@ const Videos = () => {
 
       <Modal isOpen={isOpen} onClose={closeModal}>
         <h3 className="text-xl font-medium leading-6 text-gray-900 mb-6">
-          New video
+          {isEdit ? 'Edit Video' : 'New Video'}
         </h3>
         <FormProvider {...form}>
-          <form onSubmit={form.handleSubmit(addVideo)}>
+          <form onSubmit={form.handleSubmit(isEdit ? editVideo : addVideo)}>
             <div className="mb-6">
               <Input
                 name='youtubeId'
@@ -133,7 +138,9 @@ const Videos = () => {
               />
             </div>
             <div className="mt-4 flex">
-              <Button type='submit'>Add Video</Button>
+              <Button type='submit'>
+                {isEdit ? 'Edit Video' : 'Add Video'}
+              </Button>
             </div>
           </form>
         </FormProvider>

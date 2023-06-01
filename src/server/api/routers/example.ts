@@ -42,7 +42,7 @@ export const exampleRouter = createTRPCRouter({
       })
       return result;
     }),
-  addVideoWithListId: publicProcedure
+  addVideo: publicProcedure
     .input(
       z.object({
         title: z.string(),
@@ -59,6 +59,25 @@ export const exampleRouter = createTRPCRouter({
           vid_description: description,
           vid_youtube_id: youtubeId,
           vid_lst_id: listId
+        }
+      })
+      return result;
+    }),
+  editVideo: publicProcedure
+    .input(
+      z.object({
+        description: z.string(),
+        title: z.string(),
+        videoId: z.string()
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { description, title, videoId } = input;
+      const result = await ctx.prisma.videos.update({
+        where: { vid_id: videoId },
+        data: {
+          vid_description: description,
+          vid_title: title
         }
       })
       return result;
