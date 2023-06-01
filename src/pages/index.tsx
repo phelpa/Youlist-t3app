@@ -4,34 +4,17 @@ import * as React from "react";
 import { useForm, FormProvider, type SubmitHandler } from "./components/Form";
 import { api } from "../utils/api";
 import { useRouter } from 'next/router'
+import { useConfirm } from '../pages/confirmContext'
 import useModalWithForm from './hooks/useModalWithForm';
 import Input from './components/Input'
 import Button from './components/Button'
-import { useConfirm } from '../pages/confirmContext'
+import IconButton from './components/IconButton'
+import { DeleteIcon, EditIcon } from './icons'
 
 type FormValues = {
   title: string,
   description: string
   listId: string
-};
-
-const EditIcon = () => {
-  return <svg xmlns="http://www.w3.org/2000/svg" height='16' width='16' viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" /></svg>
-}
-
-const DeleteIcon = () => {
-  return <svg xmlns="http://www.w3.org/2000/svg" height='16' width='16' viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" /></svg>
-}
-
-type IconButtonProps = {
-  children: React.ReactNode;
-  [x: string]: unknown;
-}
-
-const IconButton = ({ children, ...rest }: IconButtonProps) => {
-  return <button {...rest} type="button" className="flex items-center p-2 mr-2 text-xs font-medium text-gray-700 bg-white border border-gray-200 rounded-lg toggle-dark-state-example hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-gray-300 dark:focus:ring-gray-500 dark:bg-gray-800 focus:outline-none dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
-    {children}
-  </button>
 }
 
 const Lists = () => {
@@ -89,8 +72,8 @@ const Lists = () => {
             <dd className="text-lg font-semibold flex items-center justify-between">
               <span>{list.lst_title}</span>
               <div className='flex'>
-                <span><IconButton onClick={openModal('edit', { title: list.lst_title, description: list.lst_description, listId: list.lst_id })}><EditIcon /></IconButton></span>
-                <span><IconButton onClick={openDeleteModal(list.lst_id)}><DeleteIcon /></IconButton></span>
+                <IconButton onClick={openModal('edit', { title: list.lst_title, description: list.lst_description, listId: list.lst_id })}><EditIcon /></IconButton>
+                <IconButton onClick={openDeleteModal(list.lst_id)}><DeleteIcon /></IconButton>
               </div>
             </dd>
             <dt className="mb-1 text-gray-500">

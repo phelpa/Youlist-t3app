@@ -33,7 +33,11 @@ export const exampleRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const result = await ctx.prisma.videos.findMany({
         where: {
-          vid_lst_id: input
+          vid_lst_id: input,
+          vid_deletedAt: null
+        },
+        orderBy: {
+          vid_created: 'asc'
         }
       })
       return result;
@@ -58,6 +62,18 @@ export const exampleRouter = createTRPCRouter({
         }
       })
       return result;
+    }),
+  deleteVideo: publicProcedure
+    .input(
+      z.string()
+    )
+    .mutation(async ({ ctx, input }) => {
+      await ctx.prisma.videos.update({
+        where: { vid_id: input },
+        data: {
+          vid_deletedAt: new Date()
+        }
+      })
     }),
   addList: publicProcedure
     .input(
