@@ -2,7 +2,6 @@ import * as React from 'react';
 import { cloneElement, type FC, type JSXElementConstructor, memo } from 'react';
 
 import { ErrorMessage } from '@hookform/error-message';
-import { Typography } from 'components/Shared/Antd';
 import { Controller, useFormContext } from 'react-hook-form';
 
 interface IProps {
@@ -29,7 +28,7 @@ const Field: FC<IProps> = ({ name, render, ...otherProps }) => {
       <ErrorMessage
         name={name}
         errors={errors}
-        render={({ message }) => <span className=''>{message}</span>}
+        render={({ message }) => <span className="text-red-500">{message}</span>}
       />
     </>
   );

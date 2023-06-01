@@ -1,13 +1,12 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import Modal from "./components/Modal";
 import * as React from "react";
-import { useForm, FormProvider } from "./components/Form";
-import type { SubmitHandler } from "react-hook-form";
+import { useForm, FormProvider, type SubmitHandler } from "./components/Form";
 import { api } from "../utils/api";
 import { useRouter } from 'next/router'
 import useModalWithForm from './hooks/useModalWithForm';
 import Input from './components/Input'
-
+import Button from './components/Button'
 import { useConfirm } from '../pages/confirmContext'
 
 type FormValues = {
@@ -110,7 +109,7 @@ const Lists = () => {
       </dl>
 
       <Modal isOpen={isOpen} onClose={closeModal}>
-        <h3 className="text-lg font-medium leading-6 text-gray-900 mb-6">
+        <h3 className="text-xl font-medium leading-6 text-gray-900 mb-6">
           {isEdit ? 'Edit List' : 'New List'}
         </h3>
 
@@ -129,12 +128,11 @@ const Lists = () => {
               />
             </div>
             <div className="mt-4 flex">
-              <button
+              <Button
                 type='submit'
-                className="ml-auto mr-2 mb-2 rounded-lg border border-gray-300 px-5 py-2.5 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200"
               >
                 {isEdit ? 'Edit List' : 'Add List'}
-              </button>
+              </Button>
             </div>
           </form>
         </FormProvider>
