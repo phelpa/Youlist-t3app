@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
 import * as React from "react";
-import { useForm } from "../../shared/Form";
+import { useForm } from "../Form";
 import type { SubmitHandler } from "react-hook-form";
 
 type FormValues = {

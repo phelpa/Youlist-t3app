@@ -2,10 +2,10 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { useRouter } from "next/router";
 import { api } from "../../utils/api";
-import Modal from "../shared/Modal";
+import Modal from "../components/Modal";
 import * as React from "react";
 import { Dialog } from "@headlessui/react";
-import { useForm } from "../shared/Form";
+import { useForm } from "../components/Form";
 import type { SubmitHandler } from "react-hook-form";
 import type { ClipboardEvent } from 'react'
 import { retrieveYoutubeIdFromClipBoard } from './youtubehelper';

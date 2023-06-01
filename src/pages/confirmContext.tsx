@@ -1,5 +1,5 @@
 import * as React from 'react';
-import Modal from "./shared/Modal"
+import Modal from "./components/Modal"
 
 type ConfirmProps = {
   title: string,
@@ -57,18 +57,24 @@ function ConfirmProvider({ children }: ConfirmProviderProps) {
   return <ConfirmContext.Provider value={value}>{children}</ConfirmContext.Provider>;
 }
 
+function useConfirmAllProps() {
+  const ctx = React.useContext(ConfirmContext);
+  if (!ctx) {
+    throw new Error('You must provide a `ConfirmProvider` in order to use `useConfirmAllProps`');
+  }
+  return ctx;
+}
+
 function useConfirm() {
   const ctx = React.useContext(ConfirmContext);
   if (!ctx) {
     throw new Error('You must provide a `ConfirmProvider` in order to use `useConfirm`');
   }
-  return ctx;
+  return ctx.confirm;
 }
 
-export { ConfirmContext, ConfirmProvider, useConfirm };
-
-export const ConfirmModal = () => {
-  const { isConfirmOpen, closeConfirmModal, title, description, confirmAndClose } = useConfirm()
+const ConfirmModal = () => {
+  const { isConfirmOpen, closeConfirmModal, title, description, confirmAndClose } = useConfirmAllProps()
   return (
     <Modal isOpen={isConfirmOpen} onClose={closeConfirmModal}>
       <h3 className="text-lg font-medium leading-6 text-gray-900 mb-6">{title}</h3>
@@ -84,4 +90,6 @@ export const ConfirmModal = () => {
       </div>
     </Modal>
   )
-} 
+}
+
+export { ConfirmContext, ConfirmProvider, useConfirm, useConfirmAllProps, ConfirmModal };

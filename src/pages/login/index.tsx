@@ -1,5 +1,5 @@
-import Annotations from "../shared/Annotations";
-import VideoPlayer from "../shared/VideoPlayer";
+import Annotations from "../components/Annotations";
+import VideoPlayer from "../components/VideoPlayer";
 import { signIn, signOut, useSession } from "next-auth/react";
 
 const Login = () => {
@@ -17,12 +17,12 @@ const Login = () => {
           onClick={
             sessionData
               ? () =>
-                  void signOut({ callbackUrl: "http://localhost:3000/login" })
+                void signOut({ callbackUrl: "http://localhost:3000/login" })
               : () =>
-                  void signIn(undefined, {
-                    //aqui pode por 'google' para logar direto
-                    callbackUrl: "http://localhost:3000",
-                  })
+                void signIn(undefined, {
+                  //aqui pode por 'google' para logar direto
+                  callbackUrl: "http://localhost:3000",
+                })
           }
           rel="noopener nofollow noreferrer"
           className="hover:text-black-700 mr-3 inline-flex items-center rounded-lg border border-gray-200 bg-white px-4 py-2 text-xs font-medium text-gray-900 hover:cursor-pointer hover:bg-gray-100 focus:z-10 focus:outline-none focus:ring-2 focus:ring-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-500"
