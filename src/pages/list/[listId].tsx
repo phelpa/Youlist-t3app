@@ -25,7 +25,7 @@ const Videos = () => {
   const router = useRouter();
   const listId = router.query.listId as string;
 
-  const { data: videos, refetch } = api.example.getVideosWithListId.useQuery(listId)
+  const { data: videos, refetch } = api.example.getVideos.useQuery(listId)
   const addMutation = api.example.addVideo.useMutation({ onSuccess: () => refetch() });
   const editMutation = api.example.editVideo.useMutation({ onSuccess: () => refetch() });
   const deleteMutation = api.example.deleteVideo.useMutation({ onSuccess: () => refetch() });
@@ -35,6 +35,10 @@ const Videos = () => {
   const confirm = useConfirm();
 
   const isEdit = type === 'edit';
+
+  const goToAnnotations = (videoId: string, youtubeId: string) => async () => {
+    await router.push(`/annotations/${videoId}/${youtubeId}`)
+  }
 
   const onYoutubeUrlPaste = (e: ClipboardEvent<HTMLInputElement>) => {
     const ytId = retrieveYoutubeIdFromClipBoard(e)
@@ -84,7 +88,7 @@ const Videos = () => {
               allow="autoplay; encrypted-media"
               allowFullScreen
             ></iframe>
-            <div className="pl-6 py-4">
+            <div onClick={goToAnnotations(video.vid_id, video.vid_youtube_id)} className="pl-6 py-4 cursor-pointer hover:bg-gray-100 ">
               <div className="text-lg font-semibold flex items-center justify-between pb-2">
                 <div className="mb-2 text-xl font-bold">{video.vid_title}</div>
                 <div className='flex'>
@@ -123,7 +127,7 @@ const Videos = () => {
                 placeholder="youtube.com/watch?v="
                 onPaste={onYoutubeUrlPaste}
               />
-              <span className='text-gray-400 text-xs'>Paste the youtube url to get the id</span>
+              <span className='text-xs'>Paste the youtube url to get the id</span>
             </div>
             <div className="mb-6">
               <Input
@@ -139,7 +143,7 @@ const Videos = () => {
             </div>
             <div className="mt-4 flex">
               <Button type='submit'>
-                {isEdit ? 'Edit Video' : 'Add Video'}
+                Submit
               </Button>
             </div>
           </form>

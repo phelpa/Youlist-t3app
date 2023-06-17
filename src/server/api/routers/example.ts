@@ -26,7 +26,7 @@ export const exampleRouter = createTRPCRouter({
       })
       return result;
     }),
-  getVideosWithListId: publicProcedure
+  getVideos: publicProcedure
     .input(
       z.string()
     )
@@ -143,6 +143,22 @@ export const exampleRouter = createTRPCRouter({
           lst_deletedAt: new Date()
         }
       })
+    }),
+  getAnnotations: publicProcedure
+    .input(
+      z.string()
+    )
+    .query(async ({ ctx, input }) => {
+      const result = await ctx.prisma.annotations.findMany({
+        where: {
+          ant_vid_id: input,
+          ant_deletedAt: null
+        },
+        orderBy: {
+          ant_created: 'asc'
+        }
+      })
+      return result;
     }),
   getAll: publicProcedure.query(({ ctx }) => {
     return ctx.prisma.example.findMany();

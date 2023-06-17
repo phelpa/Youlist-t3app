@@ -114,7 +114,7 @@ const Lists = () => {
               <Button
                 type='submit'
               >
-                {isEdit ? 'Edit List' : 'Add List'}
+                Submit
               </Button>
             </div>
           </form>
