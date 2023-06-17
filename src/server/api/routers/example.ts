@@ -123,7 +123,7 @@ export const exampleRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       const { description, title, listId } = input;
-      const result = await ctx.prisma.lists.update({
+      const result = await ctx.prisma.lists.update({ //
         where: { lst_id: listId },
         data: {
           lst_description: description,
@@ -155,10 +155,58 @@ export const exampleRouter = createTRPCRouter({
           ant_deletedAt: null
         },
         orderBy: {
-          ant_created: 'asc'
+          ant_videotime: 'asc'
         }
       })
       return result;
+    }),
+  addAnnotation: publicProcedure
+    .input(
+      z.object({
+        videotime: z.number(),
+        text: z.string(),
+        videoId: z.string()
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { videotime, text, videoId } = input;
+      const result = await ctx.prisma.annotations.create({
+        data: {
+          ant_videotime: videotime,
+          ant_text: text,
+          ant_vid_id: videoId,
+        },
+      });
+      return result;
+    }),
+  editAnnotation: publicProcedure
+    .input(
+      z.object({
+        text: z.string(),
+        videoId: z.string()
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { text, videoId } = input;
+      const result = await ctx.prisma.annotations.updateMany({
+        where: { ant_vid_id: videoId },
+        data: {
+          ant_text: text,
+        }
+      })
+      return result;
+    }),
+  deleteAnnotation: publicProcedure
+    .input(
+      z.string()
+    )
+    .mutation(async ({ ctx, input }) => {
+      await ctx.prisma.annotations.update({
+        where: { ant_id: input },
+        data: {
+          ant_deletedAt: new Date()
+        }
+      })
     }),
   getAll: publicProcedure.query(({ ctx }) => {
     return ctx.prisma.example.findMany();

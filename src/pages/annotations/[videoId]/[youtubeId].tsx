@@ -1,9 +1,14 @@
+/* eslint-disable @typescript-eslint/restrict-plus-operands */
+/* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { useRouter } from "next/router"
 import YouTube from 'react-youtube'
 import * as React from 'react'
+import { useForm } from '../../components/Form'
+import type { SubmitHandler } from "../../components/Form";
+import { api } from "../../../utils/api";
 
 const fancyTimeFormat = (duration: number) => {
   // Hours, minutes and seconds
@@ -23,18 +28,34 @@ const fancyTimeFormat = (duration: number) => {
   return ret
 }
 
+type FormValues = {
+  text: string;
+};
+
 const Annotations = () => {
   const router = useRouter();
-  const { videoId, youtubeId } = router.query;
+  const { youtubeId } = router.query;
+  const videoId = router.query.videoId as string
+
   const [currentTime, setCurrentTime] = React.useState("0:00");
 
+  const { data: annotations, refetch } = api.example.getAnnotations.useQuery(videoId)
+  const addMutation = api.example.addAnnotation.useMutation({ onSuccess: () => refetch() });
 
-  const annotations = [{ videotime: 32323, text: 'aldair' }]
+  const { register, handleSubmit, setValue } = useForm<FormValues>({});
 
-  const submitAnnotation = (values: any) => {
-    const presentTime = window['youtubePlayer']?.getCurrentTime?.()
-    console.log(presentTime, 'oia ai')
-  }
+  const addAnnotation: SubmitHandler<FormValues> = ({ text }, e) => {
+    const presentTime = window["youtubePlayer"]?.getCurrentTime?.() as number;
+
+    e?.preventDefault();
+    addMutation.mutate({
+      text,
+      videotime: presentTime,
+      videoId
+    })
+    setValue("text", "")
+  };
+
 
   const makeYouTubePlayer = (e: any) => {
     window['youtubePlayer'] = e.target
@@ -51,6 +72,13 @@ const Annotations = () => {
     setCurrentTime(minute);
   };
 
+  const onStageChange = () => {
+    const presentTime = window["youtubePlayer"]?.getCurrentTime?.();
+    const minute = fancyTimeFormat(presentTime as number);
+    setCurrentTime(minute);
+  };
+
+
   return (
     <>
       <div className="flex justify-center flex-wrap gap-4 py-4 ">
@@ -60,38 +88,38 @@ const Annotations = () => {
             iframeClassName="h-full w-full"
             id="videoplayer"
             videoId={youtubeId as string}
+            onStateChange={onStageChange}
             opts={{}}
             onReady={makeYouTubePlayer}
           />
         </div>
-
         <div className="w-[100%] sm:w-[30%] mx-4">
-          {annotations?.map((annotation, i) => (
-            <div className="flex gap-2 items-center mb-2" key={i}>
+          {annotations?.map(({ ant_id, ant_videotime, ant_text }) => (
+            <div className="flex gap-2 items-center mb-2" key={ant_id}>
               <span
-                className="text-lg text-gray-500"
-                onClick={() => goToSpecificTime(annotation.videotime)}
+                className="text-lg text-gray-500 hover:cursor-pointer hover:underline"
+                onClick={() => goToSpecificTime(ant_videotime)}
               >
-                {fancyTimeFormat(annotation.videotime)}
+                {fancyTimeFormat(ant_videotime)}
               </span>
-
-              <span className="text-lg">{annotation.text}</span>
+              <span className="text-lg">{ant_text}</span>
             </div>
           ))}
-          <div className="relative mb-6">
-            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center px-3">
-              {currentTime}
+          <form onSubmit={handleSubmit(addAnnotation)}>
+            <div className="relative mb-6">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center px-3">
+                {currentTime}
+              </div>
+              <input
+                {...register("text")}
+                onClick={setMinuteAndSecond}
+                type="text"
+                id="input-group-1"
+                className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 pl-14 text-sm text-gray-900"
+                placeholder="Type and hit enter"
+              />
             </div>
-            <input
-              // {...register("text")}
-              onClick={setMinuteAndSecond}
-              type="text"
-              id="input-group-1"
-              className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 pl-14 text-sm text-gray-900"
-              placeholder="Type and hit enter"
-            />
-          </div>
-          <button type="submit" onClick={submitAnnotation} />
+          </form>
         </div>
       </div>
     </>)
