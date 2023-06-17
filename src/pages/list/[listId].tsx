@@ -88,7 +88,7 @@ const Videos = () => {
               allow="autoplay; encrypted-media"
               allowFullScreen
             ></iframe>
-            <div onClick={goToAnnotations(video.vid_id, video.vid_youtube_id)} className="pl-6 py-4 cursor-pointer hover:bg-gray-100 ">
+            <div onClick={goToAnnotations(video.vid_id, video.vid_youtube_id)} className="pl-6 py-4 cursor-pointer hover:bg-gray-100">
               <div className="text-lg font-semibold flex items-center justify-between pb-2">
                 <div className="mb-2 text-xl font-bold">{video.vid_title}</div>
                 <div className='flex'>

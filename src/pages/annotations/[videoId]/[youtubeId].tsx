@@ -9,6 +9,8 @@ import * as React from 'react'
 import { useForm } from '../../components/Form'
 import type { SubmitHandler } from "../../components/Form";
 import { api } from "../../../utils/api";
+import IconButton from '../../components/IconButton'
+import { DeleteIcon, EditIcon } from '../../icons'
 
 const fancyTimeFormat = (duration: number) => {
   // Hours, minutes and seconds
@@ -56,7 +58,6 @@ const Annotations = () => {
     setValue("text", "")
   };
 
-
   const makeYouTubePlayer = (e: any) => {
     window['youtubePlayer'] = e.target
   }
@@ -78,7 +79,13 @@ const Annotations = () => {
     setCurrentTime(minute);
   };
 
+  const [isAnnotationHovered, setIsAnnotationHovered] = React.useState('')
 
+  const handleHoveredAnnotations = (ant_id?: string) => () => {
+    ant_id ? setIsAnnotationHovered(ant_id) : setIsAnnotationHovered('')
+  }
+
+  console.log(isAnnotationHovered, 'isAnnotationHovered')
   return (
     <>
       <div className="flex justify-center flex-wrap gap-4 py-4 ">
@@ -95,14 +102,20 @@ const Annotations = () => {
         </div>
         <div className="w-[100%] sm:w-[30%] mx-4">
           {annotations?.map(({ ant_id, ant_videotime, ant_text }) => (
-            <div className="flex gap-2 items-center mb-2" key={ant_id}>
+            <div className="flex gap-2 items-center hover:bg-gray-100 p-1 rounded-md min-h-[2.6rem]" key={ant_id} onMouseEnter={handleHoveredAnnotations(ant_id)} onMouseLeave={handleHoveredAnnotations()}>
               <span
                 className="text-lg text-gray-500 hover:cursor-pointer hover:underline"
                 onClick={() => goToSpecificTime(ant_videotime)}
               >
                 {fancyTimeFormat(ant_videotime)}
               </span>
-              <span className="text-lg">{ant_text}</span>
+              <div className='flex justify-between items-center w-full'>
+                <span className="text-lg">{ant_text}</span>
+                {isAnnotationHovered === ant_id && <div className='flex'>
+                  <IconButton className='scale-75'><EditIcon className='scale-125' /></IconButton>
+                  <IconButton className='scale-75'><DeleteIcon className='scale-125' /></IconButton>
+                </div>}
+              </div>
             </div>
           ))}
           <form onSubmit={handleSubmit(addAnnotation)}>
@@ -115,7 +128,7 @@ const Annotations = () => {
                 onClick={setMinuteAndSecond}
                 type="text"
                 id="input-group-1"
-                className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 pl-14 text-sm text-gray-900"
+                className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 pl-14 text-sm text-gray-900 mt-2"
                 placeholder="Type and hit enter"
               />
             </div>
