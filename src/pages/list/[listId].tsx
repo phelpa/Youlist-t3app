@@ -116,7 +116,7 @@ const Videos = () => {
         </h3>
         <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(isEdit ? editVideo : addVideo)}>
-            <div className="mb-6">
+            {!isEdit && <div className="mb-6">
               <Input
                 name='youtubeId'
                 legend='Youtube Id'
@@ -124,7 +124,7 @@ const Videos = () => {
                 onPaste={onYoutubeUrlPaste}
               />
               <span className='text-xs'>Paste the youtube url to get the id</span>
-            </div>
+            </div>}
             <div className="mb-6">
               <Input
                 name='title'
