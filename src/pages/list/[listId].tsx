@@ -66,13 +66,9 @@ const Videos = () => {
     closeModal()
   }
 
-  const deleteVideo = (videoId: string) => {
-    deleteMutation.mutate(videoId);
-  }
-
   const openDeleteModal = (videoId: string) => (e?: React.MouseEvent<HTMLElement>) => {
     e && e.stopPropagation()
-    confirm({ title: 'Delete Video', description: 'Are you sure you want to delete the video?', onConfirm: () => deleteVideo(videoId) })
+    confirm({ title: 'Delete Video', description: 'Are you sure you want to delete the video?', onConfirm: () => deleteMutation.mutate(videoId) })
   }
 
   return (

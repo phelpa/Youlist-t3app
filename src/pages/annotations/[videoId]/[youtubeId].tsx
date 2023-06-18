@@ -11,6 +11,7 @@ import type { SubmitHandler } from "../../components/Form";
 import { api } from "../../../utils/api";
 import IconButton from '../../components/IconButton'
 import { DeleteIcon, EditIcon } from '../../icons'
+import { useConfirm } from '../../../pages/confirmContext'
 
 const fancyTimeFormat = (duration: number) => {
   // Hours, minutes and seconds
@@ -30,9 +31,6 @@ const fancyTimeFormat = (duration: number) => {
   return ret
 }
 
-type FormValues = {
-  text: string;
-};
 
 const useClickOutside = (ref: any, callback: any) => {
   const firstClick = React.useRef(true)
@@ -57,6 +55,10 @@ const useClickOutside = (ref: any, callback: any) => {
   });
 };
 
+type FormValues = {
+  text: string;
+};
+
 const Annotations = () => {
   const router = useRouter();
   const { youtubeId } = router.query;
@@ -66,8 +68,11 @@ const Annotations = () => {
 
   const { data: annotations, refetch } = api.example.getAnnotations.useQuery(videoId)
   const addMutation = api.example.addAnnotation.useMutation({ onSuccess: () => refetch() });
+  const editMutation = api.example.editAnnotation.useMutation({ onSuccess: () => refetch() });
+  const deleteMutation = api.example.deleteAnnotation.useMutation({ onSuccess: () => refetch() });
 
   const { register, handleSubmit, setValue } = useForm<FormValues>({});
+  const confirm = useConfirm();
 
   const addAnnotation: SubmitHandler<FormValues> = ({ text }, e) => {
     const presentTime = window["youtubePlayer"]?.getCurrentTime?.() as number;
@@ -117,7 +122,6 @@ const Annotations = () => {
 
   const textAreaRef = React.useRef<any>()
 
-
   useClickOutside(textAreaRef, () => {
     const storedAnnotation = annotations?.find(item => item.ant_id === isAnnotationBeingEdited)
     if (storedAnnotation?.ant_text === textBeingEdited) {
@@ -128,8 +132,16 @@ const Annotations = () => {
   const onEnterPress = (e: any) => {
     if (e.keyCode == 13 && e.shiftKey == false) {
       e.preventDefault()
+      editMutation.mutate({ text: textBeingEdited, antId: isAnnotationBeingEdited })
       updateAnnotation({ isAnnotationBeingEdited: '' })
     }
+  }
+
+  const openDeleteModal = (antId: string) => (e?: React.MouseEvent<HTMLElement>) => {
+    e && e.stopPropagation()
+    confirm({
+      title: 'Delete Annotation', description: 'Are you sure you want to delete the annotation?', onConfirm: () => deleteMutation.mutate(antId),
+    })
   }
 
   return (
@@ -172,7 +184,7 @@ const Annotations = () => {
                 }
                 {isAnnotationHovered === ant_id && !isAnnotationBeingEdited && <div className='flex'>
                   <IconButton className='scale-75' onClick={() => updateAnnotation({ isAnnotationBeingEdited: ant_id, textBeingEdited: ant_text })}><EditIcon className='scale-125' /></IconButton>
-                  <IconButton className='scale-75'><DeleteIcon className='scale-125' /></IconButton>
+                  <IconButton className='scale-75' onClick={openDeleteModal(ant_id)}><DeleteIcon className='scale-125' /></IconButton>
                 </div>}
               </div>
             </div>

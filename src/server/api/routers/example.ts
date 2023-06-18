@@ -183,13 +183,13 @@ export const exampleRouter = createTRPCRouter({
     .input(
       z.object({
         text: z.string(),
-        videoId: z.string()
+        antId: z.string()
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const { text, videoId } = input;
-      const result = await ctx.prisma.annotations.updateMany({
-        where: { ant_vid_id: videoId },
+      const { text, antId } = input;
+      const result = await ctx.prisma.annotations.update({
+        where: { ant_id: antId },
         data: {
           ant_text: text,
         }
@@ -201,6 +201,7 @@ export const exampleRouter = createTRPCRouter({
       z.string()
     )
     .mutation(async ({ ctx, input }) => {
+      console.log(input, 'oia inputtstt')
       await ctx.prisma.annotations.update({
         where: { ant_id: input },
         data: {
