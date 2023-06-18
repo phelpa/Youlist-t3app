@@ -34,6 +34,29 @@ type FormValues = {
   text: string;
 };
 
+const useClickOutside = (ref: any, callback: any) => {
+  const firstClick = React.useRef(true)
+
+  const handleClick = (e: any) => {
+    if (firstClick.current) {
+      firstClick.current = false
+      return
+    }
+
+    //se clicou fora
+    if (ref.current && !ref.current.contains(e.target) && !firstClick.current) {
+      callback();
+      firstClick.current = true
+    }
+  };
+  React.useEffect(() => {
+    document.addEventListener('click', handleClick);
+    return () => {
+      document.removeEventListener('click', handleClick);
+    };
+  });
+};
+
 const Annotations = () => {
   const router = useRouter();
   const { youtubeId } = router.query;
@@ -48,7 +71,6 @@ const Annotations = () => {
 
   const addAnnotation: SubmitHandler<FormValues> = ({ text }, e) => {
     const presentTime = window["youtubePlayer"]?.getCurrentTime?.() as number;
-
     e?.preventDefault();
     addMutation.mutate({
       text,
@@ -79,13 +101,37 @@ const Annotations = () => {
     setCurrentTime(minute);
   };
 
-  const [isAnnotationHovered, setIsAnnotationHovered] = React.useState('')
-
-  const handleHoveredAnnotations = (ant_id?: string) => () => {
-    ant_id ? setIsAnnotationHovered(ant_id) : setIsAnnotationHovered('')
+  type AnnotationState = {
+    isAnnotationHovered: string;
+    isAnnotationBeingEdited: string;
+    textBeingEdited: string;
   }
 
-  console.log(isAnnotationHovered, 'isAnnotationHovered')
+  type AnnotationReducer = (prevState: AnnotationState, nextState: Partial<AnnotationState>) => AnnotationState;
+
+  const [{ isAnnotationHovered, isAnnotationBeingEdited, textBeingEdited }, updateAnnotation] = React.useReducer<AnnotationReducer>((prev, next) => ({ ...prev, ...next }), {
+    isAnnotationHovered: '',
+    isAnnotationBeingEdited: '',
+    textBeingEdited: ''
+  })
+
+  const textAreaRef = React.useRef<any>()
+
+
+  useClickOutside(textAreaRef, () => {
+    const storedAnnotation = annotations?.find(item => item.ant_id === isAnnotationBeingEdited)
+    if (storedAnnotation?.ant_text === textBeingEdited) {
+      updateAnnotation(({ isAnnotationBeingEdited: '', textBeingEdited: '' }))
+    }
+  });
+
+  const onEnterPress = (e: any) => {
+    if (e.keyCode == 13 && e.shiftKey == false) {
+      e.preventDefault()
+      updateAnnotation({ isAnnotationBeingEdited: '' })
+    }
+  }
+
   return (
     <>
       <div className="flex justify-center flex-wrap gap-4 py-4 ">
@@ -102,7 +148,11 @@ const Annotations = () => {
         </div>
         <div className="w-[100%] sm:w-[30%] mx-4">
           {annotations?.map(({ ant_id, ant_videotime, ant_text }) => (
-            <div className="flex gap-2 items-center hover:bg-gray-100 p-1 rounded-md min-h-[2.6rem]" key={ant_id} onMouseEnter={handleHoveredAnnotations(ant_id)} onMouseLeave={handleHoveredAnnotations()}>
+            <div
+              className="flex gap-2 items-center hover:bg-gray-100 p-1 rounded-md min-h-[2.6rem]"
+              key={ant_id}
+              onMouseEnter={() => updateAnnotation({ isAnnotationHovered: ant_id })}
+              onMouseLeave={() => updateAnnotation({ isAnnotationHovered: '' })}>
               <span
                 className="text-lg text-gray-500 hover:cursor-pointer hover:underline"
                 onClick={() => goToSpecificTime(ant_videotime)}
@@ -110,9 +160,18 @@ const Annotations = () => {
                 {fancyTimeFormat(ant_videotime)}
               </span>
               <div className='flex justify-between items-center w-full'>
-                <span className="text-lg">{ant_text}</span>
-                {isAnnotationHovered === ant_id && <div className='flex'>
-                  <IconButton className='scale-75'><EditIcon className='scale-125' /></IconButton>
+                {isAnnotationBeingEdited === ant_id ?
+                  <textarea
+                    ref={textAreaRef}
+                    value={textBeingEdited}
+                    className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-1.5 text-sm text-gray-900"
+                    onChange={(e) => updateAnnotation({ textBeingEdited: e.target.value })}
+                    onKeyDown={onEnterPress}
+                  /> :
+                  <span className="text-lg">{ant_text}</span>
+                }
+                {isAnnotationHovered === ant_id && !isAnnotationBeingEdited && <div className='flex'>
+                  <IconButton className='scale-75' onClick={() => updateAnnotation({ isAnnotationBeingEdited: ant_id, textBeingEdited: ant_text })}><EditIcon className='scale-125' /></IconButton>
                   <IconButton className='scale-75'><DeleteIcon className='scale-125' /></IconButton>
                 </div>}
               </div>
