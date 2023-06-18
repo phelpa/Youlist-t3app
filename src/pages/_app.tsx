@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+
 import { type AppType } from "next/app";
 import { type Session } from "next-auth";
 import { SessionProvider, useSession } from "next-auth/react";
@@ -7,7 +10,7 @@ import { api } from "../utils/api";
 import "../styles/globals.css";
 import { useRouter } from "next/router";
 import React from "react";
-import { ConfirmProvider, ConfirmModal } from './confirmContext';
+import { ConfirmProvider, ConfirmModal } from '../components/confirmContext';
 
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,

@@ -6,12 +6,12 @@
 import { useRouter } from "next/router"
 import YouTube from 'react-youtube'
 import * as React from 'react'
-import { useForm } from '../../components/Form'
-import type { SubmitHandler } from "../../components/Form";
+import { useForm } from '../../../components/Form'
+import type { SubmitHandler } from "../../../components/Form";
 import { api } from "../../../utils/api";
-import IconButton from '../../components/IconButton'
-import { DeleteIcon, EditIcon } from '../../icons'
-import { useConfirm } from '../../../pages/confirmContext'
+import IconButton from '../../../components/IconButton'
+import { DeleteIcon, EditIcon } from '../../../components/icons'
+import { useConfirm } from '../../../components/confirmContext'
 
 const fancyTimeFormat = (duration: number) => {
   // Hours, minutes and seconds

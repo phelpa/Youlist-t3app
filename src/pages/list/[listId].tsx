@@ -2,16 +2,16 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { useRouter } from "next/router";
 import { api } from "../../utils/api";
-import Modal from "../components/Modal";
+import Modal from "../../components/Modal";
 import * as React from "react";
-import { useForm, FormProvider, type SubmitHandler } from "../components/Form";
+import { useForm, FormProvider, type SubmitHandler } from "../../components/Form";
 import type { ClipboardEvent } from 'react'
-import { retrieveYoutubeIdFromClipBoard } from './youtubehelper';
-import { useConfirm } from '../../pages/confirmContext'
-import Input from '../components/Input'
-import Button from '../components/Button'
-import IconButton from '../components/IconButton'
-import { DeleteIcon, EditIcon } from '../icons'
+import { retrieveYoutubeIdFromClipBoard } from '../../components/youtubehelper';
+import { useConfirm } from '../../components/confirmContext'
+import Input from '../../components/Input'
+import Button from '../../components/Button'
+import IconButton from '../../components/IconButton'
+import { DeleteIcon, EditIcon } from '../../components/icons'
 import useModalWithForm from '../hooks/useModalWithForm';
 
 type FormValues = {

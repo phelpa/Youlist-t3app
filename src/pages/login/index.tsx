@@ -1,5 +1,5 @@
-import Annotations from "../components/Annotations";
-import VideoPlayer from "../components/VideoPlayer";
+import Annotations from "../../components/Annotations";
+import VideoPlayer from "../../components/VideoPlayer";
 import { signIn, signOut, useSession } from "next-auth/react";
 
 const Login = () => {

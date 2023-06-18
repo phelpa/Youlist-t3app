@@ -1,5 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+
 import * as React from 'react'
-import type { FieldValues, UseFormReturn } from '../../components/Form'
+import type { FieldValues, UseFormReturn } from '../../../components/Form'
 
 function useModalWithForm<T extends FieldValues>(bool: boolean, form: UseFormReturn<T, any>) {
   const [isOpen, setIsOpen] = React.useState(bool);

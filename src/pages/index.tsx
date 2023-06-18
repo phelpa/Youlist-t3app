@@ -1,15 +1,15 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
-import Modal from "./components/Modal";
+import Modal from "../components/Modal";
 import * as React from "react";
-import { useForm, FormProvider, type SubmitHandler } from "./components/Form";
+import { useForm, FormProvider, type SubmitHandler } from "../components/Form";
 import { api } from "../utils/api";
 import { useRouter } from 'next/router'
-import { useConfirm } from '../pages/confirmContext'
+import { useConfirm } from '../components/confirmContext'
 import useModalWithForm from './hooks/useModalWithForm';
-import Input from './components/Input'
-import Button from './components/Button'
-import IconButton from './components/IconButton'
-import { DeleteIcon, EditIcon } from './icons'
+import Input from '../components/Input'
+import Button from '../components/Button'
+import IconButton from '../components/IconButton'
+import { DeleteIcon, EditIcon } from '../components/icons'
 
 type FormValues = {
   title: string,
