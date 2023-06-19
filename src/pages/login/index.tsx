@@ -17,11 +17,11 @@ const Login = () => {
           onClick={
             sessionData
               ? () =>
-                void signOut({ callbackUrl: "http://localhost:3000/login" })
+                void signOut({ callbackUrl: process.env.YOULIST_HOST })
               : () =>
                 void signIn(undefined, {
                   //aqui pode por 'google' para logar direto
-                  callbackUrl: "http://localhost:3000",
+                  callbackUrl: process.env.YOULIST_HOST,
                 })
           }
           rel="noopener nofollow noreferrer"
