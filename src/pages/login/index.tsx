@@ -1,11 +1,17 @@
 import Annotations from "../../components/Annotations";
 import VideoPlayer from "../../components/VideoPlayer";
 import { signIn, signOut, useSession } from "next-auth/react";
+import { useRouter } from "next/router";
 
 const Login = () => {
   const { data: sessionData, status } = useSession();
+  const router = useRouter();
 
   if (status === "loading") return <div>Loading...</div>;
+
+  if (status === 'authenticated') {
+    void router.push('/')
+  }
 
   return (
     <>
@@ -19,8 +25,8 @@ const Login = () => {
               ? () =>
                 void signOut({ callbackUrl: process.env.YOULIST_HOST })
               : () =>
-                void signIn(undefined, {
-                  //aqui pode por 'google' para logar direto
+                //change google to 'undefined' to make auth available for all auth providers
+                void signIn('google', {
                   callbackUrl: process.env.YOULIST_HOST,
                 })
           }
