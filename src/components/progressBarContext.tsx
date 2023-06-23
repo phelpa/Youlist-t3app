@@ -38,7 +38,6 @@ const ProgressBar = () => {
 
   const { loading: isLoading } = useProgressBarAllProps()
 
-  // const isLoading = true;
   React.useEffect(() => {
     let interval: string | number | NodeJS.Timer | undefined;
     let timeout: string | number | NodeJS.Timeout | undefined
@@ -46,6 +45,10 @@ const ProgressBar = () => {
     if (isLoading) {
       interval = setInterval(() => {
         setProgress((prevProgress) => {
+          if (prevProgress < 50) {
+            const newProgress = prevProgress + 30;
+            return newProgress > 100 ? 100 : newProgress;
+          }
           const newProgress = prevProgress + 5;
           return newProgress > 100 ? 100 : newProgress;
         });
