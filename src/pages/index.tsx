@@ -5,6 +5,7 @@ import { useForm, FormProvider, type SubmitHandler } from "../components/Form";
 import { api } from "../utils/api";
 import { useRouter } from 'next/router'
 import { useConfirm } from '../components/confirmContext'
+import { useProgressBar } from '../components/progressBarContext';
 import useModalWithForm from './hooks/useModalWithForm';
 import Input from '../components/Input'
 import Button from '../components/Button'
@@ -26,7 +27,10 @@ const Lists = () => {
 
   const router = useRouter()
 
-  const { data: lists, refetch } = api.example.getLists.useQuery();
+  const { data: lists, refetch, isFetching } = api.example.getLists.useQuery();
+  const setLoading = useProgressBar()
+  setLoading(isFetching)
+
   const addMutation = api.example.addList.useMutation({ onSuccess: () => refetch() });
   const editMutation = api.example.editList.useMutation({ onSuccess: () => refetch() });
   const deleteMutation = api.example.deleteList.useMutation({ onSuccess: () => refetch() });
