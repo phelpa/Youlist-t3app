@@ -17,6 +17,7 @@ function useModalWithForm<T extends FieldValues>(bool: boolean, form: UseFormRet
   const openModal = (type: 'add' | 'edit', formValues?: T) => (e?: React.MouseEvent<HTMLElement>) => {
     e && e.stopPropagation()
     if (type === 'add') {
+      form.reset();
       setIsOpen(true);
       setType('add')
       return
