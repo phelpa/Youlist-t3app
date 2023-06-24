@@ -99,7 +99,7 @@ const Lists = () => {
           {isEdit ? 'Edit List' : 'New List'}
         </h3>
 
-        <FormProvider {...form}>
+        {isOpen && <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(isEdit ? editList : addList)}>
             <div className="mb-6">
               <Input
@@ -121,7 +121,7 @@ const Lists = () => {
               </Button>
             </div>
           </form>
-        </FormProvider>
+        </FormProvider>}
       </Modal>
     </div>
   );
