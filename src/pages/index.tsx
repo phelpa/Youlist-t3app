@@ -27,13 +27,16 @@ const Lists = () => {
 
   const router = useRouter()
 
-  const { data: lists, refetch, isFetching } = api.example.getLists.useQuery();
-  const setLoading = useProgressBar()
-  setLoading(isFetching)
+  const { data: lists, refetch } = api.example.getLists.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+  });
 
-  const addMutation = api.example.addList.useMutation({ onSuccess: () => refetch() });
-  const editMutation = api.example.editList.useMutation({ onSuccess: () => refetch() });
-  const deleteMutation = api.example.deleteList.useMutation({ onSuccess: () => refetch() });
+  const addMutation = api.example.addList.useMutation({ onSuccess: () => refetch() })
+  const editMutation = api.example.editList.useMutation({ onSuccess: () => refetch() })
+  const deleteMutation = api.example.deleteList.useMutation({ onSuccess: () => refetch() })
+
+  const setLoading = useProgressBar()
+  setLoading(addMutation.isLoading || editMutation.isLoading || deleteMutation.isLoading)
 
   const goToList = (listId: string) => async () => {
     await router.push(`/list/${listId}`)
@@ -56,13 +59,9 @@ const Lists = () => {
     closeModal()
   }
 
-  const deleteList = (listId: string) => {
-    deleteMutation.mutate(listId);
-  }
-
   const openDeleteModal = (listId: string) => (e?: React.MouseEvent<HTMLElement>) => {
     e && e.stopPropagation()
-    confirm({ title: 'Delete List', description: 'Are you sure you want to delete the list?', onConfirm: () => deleteList(listId) })
+    confirm({ title: 'Delete List', description: 'Are you sure you want to delete the list?', onConfirm: () => deleteMutation.mutate(listId) })
   }
 
   return (

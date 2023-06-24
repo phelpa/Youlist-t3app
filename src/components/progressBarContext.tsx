@@ -52,7 +52,7 @@ const ProgressBar = () => {
           const newProgress = prevProgress + 5;
           return newProgress > 100 ? 100 : newProgress;
         });
-      }, 500);
+      }, 100);
     } else {
       setProgress(100);
 
