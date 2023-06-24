@@ -27,7 +27,7 @@ const Lists = () => {
 
   const router = useRouter()
 
-  const { data: lists, refetch } = api.example.getLists.useQuery(undefined, {
+  const { data: lists, refetch, isInitialLoading } = api.example.getLists.useQuery(undefined, {
     refetchOnWindowFocus: false,
   });
 
@@ -36,7 +36,7 @@ const Lists = () => {
   const deleteMutation = api.example.deleteList.useMutation({ onSuccess: () => refetch() })
 
   const setLoading = useProgressBar()
-  setLoading(addMutation.isLoading || editMutation.isLoading || deleteMutation.isLoading)
+  setLoading(addMutation.isLoading || editMutation.isLoading || deleteMutation.isLoading || isInitialLoading)
 
   const goToList = (listId: string) => async () => {
     await router.push(`/list/${listId}`)
