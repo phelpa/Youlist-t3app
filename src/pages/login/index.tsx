@@ -18,7 +18,7 @@ const Login = () => {
       {sessionData && <span>Logged in as {sessionData.user?.name}</span>}
       {console.log(sessionData, "oia sessionData")}
       <div className="align-center my-2 flex flex-col items-center">
-        <div className="p-2 text-5xl">YouList</div>
+        <div className="p-2 text-5xl">My<span className='text-red-500'>Youtube</span>Notes</div>
         <a
           onClick={
             sessionData
