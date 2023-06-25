@@ -8,6 +8,7 @@ import { useForm, FormProvider, type SubmitHandler } from "../../components/Form
 import type { ClipboardEvent } from 'react'
 import { retrieveYoutubeIdFromClipBoard } from '../../components/youtubehelper';
 import { useConfirm } from '../../components/confirmContext'
+import { useProgressBar } from '../../components/progressBarContext';
 import Input from '../../components/Input'
 import Button from '../../components/Button'
 import IconButton from '../../components/IconButton'
@@ -25,10 +26,13 @@ const Videos = () => {
   const router = useRouter();
   const listId = router.query.listId as string;
 
-  const { data: videos, refetch } = api.example.getVideos.useQuery(listId)
+  const { data: videos, refetch, isInitialLoading } = api.example.getVideos.useQuery(listId)
   const addMutation = api.example.addVideo.useMutation({ onSuccess: () => refetch() });
   const editMutation = api.example.editVideo.useMutation({ onSuccess: () => refetch() });
   const deleteMutation = api.example.deleteVideo.useMutation({ onSuccess: () => refetch() });
+
+  const progressBar = useProgressBar()
+  progressBar(addMutation.isLoading || editMutation.isLoading || deleteMutation.isLoading || isInitialLoading)
 
   const form = useForm<FormValues>({});
   const { isOpen, openModal, closeModal, type } = useModalWithForm(false, form)
@@ -71,6 +75,8 @@ const Videos = () => {
     confirm({ title: 'Delete Video', description: 'Are you sure you want to delete the video?', onConfirm: () => deleteMutation.mutate(videoId) })
   }
 
+  const [isVideoBeingHovered, setIsVideoBeingHovered] = React.useState('')
+
   return (
     <>
       <div className="flex flex-wrap justify-around gap-8 py-4">
@@ -84,13 +90,16 @@ const Videos = () => {
               allow="autoplay; encrypted-media"
               allowFullScreen
             ></iframe>
-            <div onClick={goToAnnotations(video.vid_id, video.vid_youtube_id)} className="pl-6 py-4 cursor-pointer hover:bg-gray-100">
+            <div onClick={goToAnnotations(video.vid_id, video.vid_youtube_id)} className="pl-6 py-4 cursor-pointer hover:bg-gray-100"
+              onMouseEnter={() => setIsVideoBeingHovered(video.vid_id)}
+              onMouseLeave={() => setIsVideoBeingHovered('')}
+            >
               <div className="text-lg font-semibold flex items-center justify-between pb-2">
-                <div className="mb-2 text-xl font-bold">{video.vid_title}</div>
-                <div className='flex'>
+                <div className="text-xl font-bold">{video.vid_title}</div>
+                {isVideoBeingHovered === video.vid_id && <div className='flex'>
                   <IconButton onClick={openModal('edit', { title: video.vid_title, description: video.vid_description, videoId: video.vid_id, youtubeId: video.vid_youtube_id })}><EditIcon /></IconButton>
                   <IconButton onClick={openDeleteModal(video.vid_id)}><DeleteIcon /></IconButton>
-                </div>
+                </div>}
               </div>
               <p className="text-base text-gray-700">
                 {video.vid_description}

@@ -35,8 +35,8 @@ const Lists = () => {
   const editMutation = api.example.editList.useMutation({ onSuccess: () => refetch() })
   const deleteMutation = api.example.deleteList.useMutation({ onSuccess: () => refetch() })
 
-  const setLoading = useProgressBar()
-  setLoading(addMutation.isLoading || editMutation.isLoading || deleteMutation.isLoading || isInitialLoading)
+  const progressBar = useProgressBar()
+  progressBar(addMutation.isLoading || editMutation.isLoading || deleteMutation.isLoading || isInitialLoading)
 
   const goToList = (listId: string) => async () => {
     await router.push(`/list/${listId}`)
@@ -64,6 +64,8 @@ const Lists = () => {
     confirm({ title: 'Delete List', description: 'Are you sure you want to delete the list?', onConfirm: () => deleteMutation.mutate(listId) })
   }
 
+  const [isListBeingHovered, setIsListBeingHovered] = React.useState('')
+
   return (
     <div className="flex justify-center px-2">
       <dl className="max-w-md divide-y divide-gray-200 text-gray-900 dark:divide-gray-700 dark:text-white">
@@ -71,13 +73,15 @@ const Lists = () => {
           <h2 className="my-3 text-2xl font-semibold">Lists</h2>
         </div>
         {lists?.map(list => (
-          <div onClick={goToList(list.lst_id)} key={list.lst_id} className="flex cursor-pointer flex-col py-3 px-2 hover:bg-gray-100 min-w-[300px]">
+          <div onClick={goToList(list.lst_id)} key={list.lst_id} className="flex cursor-pointer flex-col py-3 px-2 hover:bg-gray-100 min-w-[300px]"
+            onMouseEnter={() => setIsListBeingHovered(list.lst_id)}
+            onMouseLeave={() => setIsListBeingHovered('')}>
             <dd className="text-lg font-semibold flex items-center justify-between">
               <span>{list.lst_title}</span>
-              <div className='flex'>
+              {isListBeingHovered === list.lst_id && <div className='flex'>
                 <IconButton onClick={openModal('edit', { title: list.lst_title, description: list.lst_description, listId: list.lst_id })}><EditIcon /></IconButton>
                 <IconButton onClick={openDeleteModal(list.lst_id)}><DeleteIcon /></IconButton>
-              </div>
+              </div>}
             </dd>
             <dt className="mb-1 text-gray-500">
               {list.lst_description}

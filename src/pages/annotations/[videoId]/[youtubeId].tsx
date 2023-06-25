@@ -12,6 +12,7 @@ import { api } from "../../../utils/api";
 import IconButton from '../../../components/IconButton'
 import { DeleteIcon, EditIcon } from '../../../components/icons'
 import { useConfirm } from '../../../components/confirmContext'
+import { useProgressBar } from '../../../components/progressBarContext';
 
 const fancyTimeFormat = (duration: number) => {
   // Hours, minutes and seconds
@@ -66,13 +67,16 @@ const Annotations = () => {
 
   const [currentTime, setCurrentTime] = React.useState("0:00");
 
-  const { data: annotations, refetch } = api.example.getAnnotations.useQuery(videoId)
+  const { data: annotations, refetch, isInitialLoading } = api.example.getAnnotations.useQuery(videoId)
   const addMutation = api.example.addAnnotation.useMutation({ onSuccess: () => refetch() });
   const editMutation = api.example.editAnnotation.useMutation({ onSuccess: () => refetch() });
   const deleteMutation = api.example.deleteAnnotation.useMutation({ onSuccess: () => refetch() });
 
   const { register, handleSubmit, setValue } = useForm<FormValues>({});
   const confirm = useConfirm();
+
+  const progressBar = useProgressBar()
+  progressBar(addMutation.isLoading || editMutation.isLoading || deleteMutation.isLoading || isInitialLoading)
 
   const addAnnotation: SubmitHandler<FormValues> = ({ text }, e) => {
     const presentTime = window["youtubePlayer"]?.getCurrentTime?.() as number;
@@ -183,8 +187,8 @@ const Annotations = () => {
                   <span className="text-lg">{ant_text}</span>
                 }
                 {isAnnotationHovered === ant_id && !isAnnotationBeingEdited && <div className='flex'>
-                  <IconButton className='scale-75' onClick={() => updateAnnotation({ isAnnotationBeingEdited: ant_id, textBeingEdited: ant_text })}><EditIcon className='scale-125' /></IconButton>
-                  <IconButton className='scale-75' onClick={openDeleteModal(ant_id)}><DeleteIcon className='scale-125' /></IconButton>
+                  <IconButton onClick={() => updateAnnotation({ isAnnotationBeingEdited: ant_id, textBeingEdited: ant_text })}><EditIcon /></IconButton>
+                  <IconButton onClick={openDeleteModal(ant_id)}><DeleteIcon /></IconButton>
                 </div>}
               </div>
             </div>
