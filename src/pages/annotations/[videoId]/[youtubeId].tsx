@@ -32,28 +32,22 @@ const fancyTimeFormat = (duration: number) => {
   return ret
 }
 
+const EVENT = 'mousedown';
 
-const useClickOutside = (ref: any, callback: any) => {
-  const firstClick = React.useRef(true)
+const useClickAway = (ref: any, callback: any) => {
 
-  const handleClick = (e: any) => {
-    if (firstClick.current) {
-      firstClick.current = false
-      return
-    }
-
-    //se clicou fora
-    if (ref.current && !ref.current.contains(e.target) && !firstClick.current) {
-      callback();
-      firstClick.current = true
-    }
-  };
   React.useEffect(() => {
-    document.addEventListener('click', handleClick);
-    return () => {
-      document.removeEventListener('click', handleClick);
+    const listener = (event: any) => {
+      if (!ref || !ref.current || ref.current.contains(event.target)) {
+        return;
+      }
+      callback(event);
     };
-  });
+    document.addEventListener(EVENT, listener);
+    return () => {
+      document.removeEventListener(EVENT, listener);
+    };
+  }, [ref, callback]);
 };
 
 type FormValues = {
@@ -126,18 +120,24 @@ const Annotations = () => {
 
   const textAreaRef = React.useRef<any>()
 
-  useClickOutside(textAreaRef, () => {
+  useClickAway(textAreaRef, () => {
     const storedAnnotation = annotations?.find(item => item.ant_id === isAnnotationBeingEdited)
     if (storedAnnotation?.ant_text === textBeingEdited) {
       updateAnnotation(({ isAnnotationBeingEdited: '', textBeingEdited: '' }))
     }
   });
 
-  const onEnterPress = (e: any) => {
+  const onEnterPressEdit = (e: any) => {
     if (e.keyCode == 13 && e.shiftKey == false) {
       e.preventDefault()
       editMutation.mutate({ text: textBeingEdited, antId: isAnnotationBeingEdited })
       updateAnnotation({ isAnnotationBeingEdited: '' })
+    }
+  }
+
+  const onEnterPressSubmit = async (e: any) => {
+    if (e.keyCode == 13 && e.shiftKey == false) {
+      await handleSubmit(addAnnotation)();
     }
   }
 
@@ -182,7 +182,8 @@ const Annotations = () => {
                     value={textBeingEdited}
                     className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-1.5 text-sm text-gray-900"
                     onChange={(e) => updateAnnotation({ textBeingEdited: e.target.value })}
-                    onKeyDown={onEnterPress}
+                    onKeyDown={onEnterPressEdit}
+                    rows={1}
                   /> :
                   <span className="text-lg">{ant_text}</span>
                 }
@@ -193,21 +194,19 @@ const Annotations = () => {
               </div>
             </div>
           ))}
-          <form onSubmit={handleSubmit(addAnnotation)}>
-            <div className="relative mb-6">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center px-3">
-                {currentTime}
-              </div>
-              <input
-                {...register("text")}
-                onClick={setMinuteAndSecond}
-                type="text"
-                id="input-group-1"
-                className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 pl-14 text-sm text-gray-900 mt-2"
-                placeholder="Type and hit enter"
-              />
+          <div className="relative mb-6">
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center px-3">
+              {currentTime}
             </div>
-          </form>
+            <textarea
+              {...register("text")}
+              rows={1}
+              onClick={setMinuteAndSecond}
+              className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 pl-14 text-sm text-gray-900 mt-2"
+              placeholder="Type and hit enter"
+              onKeyDown={onEnterPressSubmit}
+            />
+          </div>
         </div>
       </div>
     </>)
