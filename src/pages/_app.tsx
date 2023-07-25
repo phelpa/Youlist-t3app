@@ -42,17 +42,17 @@ function Auth({ children }: AuthProps) {
   const { status } = useSession();
   const router = useRouter();
 
+  React.useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/login");
+    }
+
+  }, [status, router])
+
   if (status === "loading") {
     return <div>Loading...</div>;
   }
 
-  if (status === "unauthenticated") {
-    return (
-      <div onClick={() => void router.push("/login")}>
-        You are unauthenticated, click here to go to Login Page
-      </div>
-    );
-  }
 
   return <>{children}</>;
 }
