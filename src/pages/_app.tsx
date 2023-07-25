@@ -44,7 +44,7 @@ function Auth({ children }: AuthProps) {
 
   React.useEffect(() => {
     if (status === "unauthenticated") {
-      router.push("/login");
+      void router.push("/login");
     }
 
   }, [status, router])
